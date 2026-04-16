@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Thêm nhà cung cấp{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Thêm nhà cung cấp</h1>
+    <div class="id-display">Mã NCC: {{ did }}</div>
+    <form method="POST">
+        <label>Tên nhà cung cấp</label>
+        <input type="text" name="dname" required>
+        <button type="submit">Thêm nhà cung cấp</button>
+    </form>
+</div>
+{% endblock %}

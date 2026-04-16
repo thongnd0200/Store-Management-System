@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Cập nhật sản phẩm{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Cập nhật sản phẩm</h1>
+    <form class="inline-form" method="GET">
+        <div class="field">
+            <label>Mã sản phẩm</label>
+            <input type="text" name="pid" value="{{ pid or '' }}">
+        </div>
+        <button type="submit">Tìm kiếm</button>
+    </form>
+    {% if product %}
+    <form method="POST">
+        <input type="hidden" name="pid" value="{{ product[0] }}">
+        <label>Tên sản phẩm</label>
+        <input type="text" name="pname" value="{{ product[1] }}" required>
+        <div class="form-row">
+            <div>
+                <label>ĐVT chính</label>
+                <input type="text" name="unit1" value="{{ product[2] }}" required>
+            </div>
+            <div>
+                <label>ĐVT phụ (tùy chọn)</label>
+                <input type="text" name="unit2" id="unit2" value="{{ product[3] or '' }}">
+            </div>
+        </div>
+        <div class="form-row">
+            <div id="cf-group" style="{{ '' if product[3] else 'display:none;' }}">
+                <label>Hệ số quy đổi</label>
+                <input type="number" name="conversion_factor" id="conversion_factor" step="any" value="{{ product[4] or '' }}">
+            </div>
+            <div>
+                <label>Số lượng tồn kho (theo ĐVT chính)</label>
+                <input type="number" name="quantity" step="any" value="{{ product[5] }}" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label>Đơn giá (theo ĐVT chính)</label>
+                <input type="number" name="price" step="any" value="{{ product[6] }}" required>
+            </div>
+        </div>
+        <button type="submit">Cập nhật</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+var unit2 = document.getElementById('unit2');
+if (unit2) {
+    unit2.addEventListener('input', function() {
+        document.getElementById('cf-group').style.display = this.value.trim() ? 'block' : 'none';
+    });
+}
+</script>
+{% endblock %}

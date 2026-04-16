@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Hệ Thống Quản Lý Cửa Hàng{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Hệ Thống Quản Lý Cửa Hàng</h1>
+
+    <h2 style="margin-top: 8px;">Danh sách</h2>
+    <div class="menu-grid">
+        <a href="{{ url_for('product_list') }}">Sản phẩm</a>
+        <a href="{{ url_for('product_stock') }}">Kho hàng</a>
+        <a href="{{ url_for('invoice_display') }}">Hóa đơn</a>
+        <a href="{{ url_for('purchase_display') }}">Phiếu nhập</a>
+        <a href="{{ url_for('customer_display') }}">Khách hàng</a>
+        <a href="{{ url_for('dealer_display') }}">Nhà cung cấp</a>
+        <a href="{{ url_for('salesperson_display') }}">Nhân viên</a>
+    </div>
+
+    <h2 style="margin-top: 24px;">Thêm mới</h2>
+    <div class="menu-grid menu-grid-add">
+        <a href="{{ url_for('product_add') }}">Thêm sản phẩm</a>
+        <a href="{{ url_for('customer_add') }}">Thêm khách hàng</a>
+        <a href="{{ url_for('dealer_add') }}">Thêm nhà cung cấp</a>
+        <a href="{{ url_for('salesperson_add') }}">Thêm nhân viên</a>
+        <a href="{{ url_for('invoice_add') }}">Tạo hóa đơn</a>
+        <a href="{{ url_for('purchase_add') }}">Tạo phiếu nhập</a>
+    </div>
+</div>
+{% endblock %}

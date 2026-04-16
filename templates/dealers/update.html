@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Cập nhật nhà cung cấp{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Cập nhật nhà cung cấp</h1>
+    <form class="inline-form" method="GET">
+        <div class="field">
+            <label>Mã NCC</label>
+            <input type="text" name="did" value="{{ did or '' }}">
+        </div>
+        <button type="submit">Tìm kiếm</button>
+    </form>
+    {% if dealer %}
+    <form method="POST">
+        <input type="hidden" name="did" value="{{ dealer[0] }}">
+        <label>Tên nhà cung cấp</label>
+        <input type="text" name="dname" value="{{ dealer[1] }}" required>
+        <button type="submit">Cập nhật</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

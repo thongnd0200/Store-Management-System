@@ -1,0 +1,72 @@
+CREATE TABLE IF NOT EXISTS Product (
+    PID TEXT PRIMARY KEY,
+    PName TEXT NOT NULL,
+    Unit1 TEXT NOT NULL,
+    Unit2 TEXT,
+    ConversionFactor REAL,
+    Quantity REAL NOT NULL,
+    Price INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Customer (
+    CID TEXT PRIMARY KEY,
+    CName TEXT NOT NULL,
+    Address TEXT,
+    IDNumber TEXT,
+    Phone TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Dealer (
+    DID TEXT PRIMARY KEY,
+    DName TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Salesperson (
+    SID TEXT PRIMARY KEY,
+    SName TEXT NOT NULL,
+    Phone TEXT
+);
+
+CREATE TABLE IF NOT EXISTS Invoices (
+    InvoiceID TEXT PRIMARY KEY,
+    CID TEXT NOT NULL,
+    SalespersonID TEXT,
+    InvoiceDate TEXT NOT NULL,
+    CreatedAt TEXT DEFAULT (datetime('now', 'localtime')),
+    Discount REAL DEFAULT 0,
+    TotalAmt REAL,
+    FOREIGN KEY (CID) REFERENCES Customer(CID) ON DELETE CASCADE,
+    FOREIGN KEY (SalespersonID) REFERENCES Salesperson(SID)
+);
+
+CREATE TABLE IF NOT EXISTS InvoiceDetails (
+    LineID INTEGER PRIMARY KEY AUTOINCREMENT,
+    InvoiceID TEXT NOT NULL,
+    PID TEXT NOT NULL,
+    SelectedUnit TEXT NOT NULL,
+    Quantity REAL NOT NULL,
+    Price INTEGER NOT NULL,
+    Discount REAL DEFAULT 0,
+    FOREIGN KEY (InvoiceID) REFERENCES Invoices(InvoiceID) ON DELETE CASCADE,
+    FOREIGN KEY (PID) REFERENCES Product(PID)
+);
+
+CREATE TABLE IF NOT EXISTS Purchases (
+    PurchaseID TEXT PRIMARY KEY,
+    DID TEXT NOT NULL,
+    PurchaseDate TEXT NOT NULL,
+    CreatedAt TEXT DEFAULT (datetime('now', 'localtime')),
+    TotalAmt REAL,
+    FOREIGN KEY (DID) REFERENCES Dealer(DID)
+);
+
+CREATE TABLE IF NOT EXISTS PurchaseDetails (
+    LineID INTEGER PRIMARY KEY AUTOINCREMENT,
+    PurchaseID TEXT NOT NULL,
+    PID TEXT NOT NULL,
+    SelectedUnit TEXT NOT NULL,
+    Quantity REAL NOT NULL,
+    Price INTEGER NOT NULL,
+    FOREIGN KEY (PurchaseID) REFERENCES Purchases(PurchaseID) ON DELETE CASCADE,
+    FOREIGN KEY (PID) REFERENCES Product(PID)
+);

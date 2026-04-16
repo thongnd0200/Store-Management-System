@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Thêm khách hàng{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Thêm khách hàng</h1>
+    <div class="id-display">Mã khách hàng: {{ cid }}</div>
+    <form method="POST">
+        <label>Tên khách hàng</label>
+        <input type="text" name="cname" required>
+        <label>Địa chỉ</label>
+        <input type="text" name="address" required>
+        <div class="form-row">
+            <div>
+                <label>CMND/CCCD</label>
+                <input type="text" name="idnumber">
+            </div>
+            <div>
+                <label>Số điện thoại</label>
+                <input type="text" name="phone">
+            </div>
+        </div>
+        <button type="submit">Thêm khách hàng</button>
+    </form>
+</div>
+{% endblock %}

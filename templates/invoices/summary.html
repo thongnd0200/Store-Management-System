@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Tổng hợp đơn hàng{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="no-print" style="margin-bottom: 20px;">
+        <a href="{{ url_for('invoice_display') }}" style="display: inline-block; margin-right: 10px; text-decoration: none; color: #333; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px;">&larr; Quay lại danh sách</a>
+        <button onclick="window.print()" style="padding: 6px 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">In tổng hợp</button>
+    </div>
+
+    <h1>Tổng hợp đơn hàng</h1>
+
+    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+        <p><strong>Số hóa đơn:</strong> {{ invoice_ids|length }}</p>
+        <p><strong>Danh sách HĐ:</strong> {{ invoice_ids|join(', ') }}</p>
+        {% if invoices %}
+        <p><strong>Từ ngày:</strong> {{ invoices[0][2] }} — <strong>Đến ngày:</strong> {{ invoices[-1][2] }}</p>
+        {% endif %}
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid #333;">
+                <th style="padding: 10px;">Mã SP</th>
+                <th style="padding: 10px;">Tên sản phẩm</th>
+                <th style="padding: 10px; text-align: right;">SL (ĐVT chính)</th>
+                <th style="padding: 10px; text-align: right;">SL (ĐVT phụ)</th>
+                <th style="padding: 10px; text-align: right;">Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for pid, p in product_list %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 10px;">{{ pid }}</td>
+                <td style="padding: 10px;">{{ p.pname }}</td>
+                <td style="padding: 10px; text-align: right;">
+                    {% if p.qty_unit1 > 0 %}{{ '{:,.2f}'.format(p.qty_unit1) }} {{ p.unit1 }}{% else %}-{% endif %}
+                </td>
+                <td style="padding: 10px; text-align: right;">
+                    {% if p.unit2 and p.qty_unit2 > 0 %}{{ '{:,.2f}'.format(p.qty_unit2) }} {{ p.unit2 }}{% else %}-{% endif %}
+                </td>
+                <td style="padding: 10px; text-align: right;">{{ '{:,.0f}'.format(p.total_amount) }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr style="border-top: 2px solid #333; font-weight: bold;">
+                <td colspan="2" style="padding: 10px; text-align: right;">Tổng cộng:</td>
+                <td style="padding: 10px; text-align: right;">{{ '{:,.2f}'.format(total_unit1) }}</td>
+                <td style="padding: 10px; text-align: right;">{{ '{:,.2f}'.format(total_unit2) }}</td>
+                <td style="padding: 10px; text-align: right;">{{ '{:,.0f}'.format(grand_total) }}</td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% endblock %}

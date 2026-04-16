@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Phiếu nhập{% endblock %}
+{% block content %}
+<div class="card">
+    {% if purchase_id %}
+        <div class="no-print" style="margin-bottom: 20px;">
+            <a href="{{ url_for('purchase_display') }}" style="display: inline-block; margin-right: 10px; text-decoration: none; color: #333; border: 1px solid #ccc; padding: 8px 14px; border-radius: 4px; font-size: 14px; line-height: 1.2;">&larr; Quay lại danh sách</a>
+            <a href="{{ url_for('purchase_update', purchase_id=purchase_id) }}" style="display: inline-block; margin-right: 10px; text-decoration: none; color: #fff; background-color: #f39c12; padding: 8px 14px; border-radius: 4px; font-size: 14px; line-height: 1.2;">Sửa</a>
+            <button onclick="window.print()" style="padding: 8px 14px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; line-height: 1.2;">In phiếu nhập</button>
+        </div>
+
+        {% if purchase %}
+        <h1 style="text-align: center;">PHIẾU NHẬP HÀNG</h1>
+        <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
+            <p><strong>Mã phiếu:</strong> {{ purchase[0] }}</p>
+            <p><strong>Nhà cung cấp:</strong> {{ dname }}</p>
+            <p><strong>Ngày:</strong> {{ purchase[2] }}</p>
+        </div>
+        {% if items %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid #ccc;">
+                    <th style="padding: 10px;">STT</th>
+                    <th style="padding: 10px;">Mã SP</th>
+                    <th style="padding: 10px;">Tên sản phẩm</th>
+                    <th style="padding: 10px;">Đơn vị</th>
+                    <th style="padding: 10px;">Số lượng</th>
+                    <th style="padding: 10px;">Đơn giá</th>
+                    <th style="padding: 10px;">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">{{ loop.index }}</td>
+                    <td style="padding: 10px;">{{ item[0] }}</td>
+                    <td style="padding: 10px;">{{ item[1] }}</td>
+                    <td style="padding: 10px;">{{ item[2] }}</td>
+                    <td style="padding: 10px;">{{ item[3] }}</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(item[4]) }}</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(item[3] * item[4]) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr style="border-top: 2px solid #333; font-weight: bold;">
+                    <td colspan="6" style="padding: 10px; text-align: right;">Tổng cộng:</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(items_total) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        {% else %}
+        <p>Không có chi tiết cho phiếu nhập này.</p>
+        {% endif %}
+        {% endif %}
+
+    {% else %}
+        <h1>Phiếu nhập</h1>
+        <form method="GET" action="{{ url_for('purchase_display') }}" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+            <input type="text" name="q" value="{{ q }}" placeholder="Tìm theo mã phiếu nhập hoặc mã NCC..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 0;">
+            <button type="submit" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Tìm kiếm</button>
+        </form>
+
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid #ccc;">
+                    <th style="padding: 10px;">STT</th>
+                    <th style="padding: 10px;">Mã PN</th>
+                    <th style="padding: 10px;">Mã NCC</th>
+                    <th style="padding: 10px;">Tên NCC</th>
+                    <th style="padding: 10px;">Ngày</th>
+                    <th style="padding: 10px;">Tổng tiền</th>
+                    <th style="padding: 10px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in purchases %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">{{ (page - 1) * 10 + loop.index }}</td>
+                    <td style="padding: 10px;">{{ p[0] }}</td>
+                    <td style="padding: 10px;">{{ p[1] }}</td>
+                    <td style="padding: 10px;">{{ p[2] }}</td>
+                    <td style="padding: 10px;">{{ p[3] }}</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(p[4]) if p[4] else 0 }}</td>
+                    <td style="padding: 10px; white-space: nowrap;">
+                        <a href="{{ url_for('purchase_display', purchase_id=p[0]) }}" style="color: #007bff; text-decoration: none; margin-right: 8px;">Xem</a>
+                        <a href="{{ url_for('purchase_update', purchase_id=p[0]) }}" style="color: #f39c12; text-decoration: none; margin-right: 8px;">Sửa</a>
+                        <form method="POST" action="{{ url_for('purchase_delete') }}" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phiếu nhập {{ p[0] }}?');">
+                            <input type="hidden" name="purchase_id" value="{{ p[0] }}">
+                            <input type="hidden" name="redirect_to" value="{{ url_for('purchase_display', q=q, page=page) }}">
+                            <button type="submit" style="background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0; font-size: inherit;">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="padding: 10px; text-align: center;">Không tìm thấy phiếu nhập.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+            {% if page > 1 %}
+            <a href="{{ url_for('purchase_display', q=q, page=page-1) }}" style="padding: 5px 10px; border: 1px solid #ccc; text-decoration: none; border-radius: 4px; color: #333;">Trước</a>
+            {% endif %}
+
+            <span>Trang {{ page }} / {{ total_pages if total_pages > 0 else 1 }}</span>
+
+            {% if page < total_pages %}
+            <a href="{{ url_for('purchase_display', q=q, page=page+1) }}" style="padding: 5px 10px; border: 1px solid #ccc; text-decoration: none; border-radius: 4px; color: #333;">Sau</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

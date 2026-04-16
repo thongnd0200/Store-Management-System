@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Danh sách khách hàng{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Khách hàng</h1>
+    <form method="GET" action="{{ url_for('customer_display') }}" style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Tìm theo tên khách hàng..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 0;">
+        <button type="submit" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Tìm kiếm</button>
+    </form>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 1px solid #ccc;">
+                <th style="padding: 10px;">STT</th>
+                <th style="padding: 10px;">Mã KH</th>
+                <th style="padding: 10px;">Tên</th>
+                <th style="padding: 10px;">Địa chỉ</th>
+                <th style="padding: 10px;">CMND/CCCD</th>
+                <th style="padding: 10px;">Số điện thoại</th>
+                <th style="padding: 10px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 10px;">{{ (page - 1) * 10 + loop.index }}</td>
+                <td style="padding: 10px;">{{ customer[0] }}</td>
+                <td style="padding: 10px;">{{ customer[1] }}</td>
+                <td style="padding: 10px;">{{ customer[2] }}</td>
+                <td style="padding: 10px;">{{ customer[3] }}</td>
+                <td style="padding: 10px;">{{ customer[4] }}</td>
+                <td style="padding: 10px; white-space: nowrap;">
+                    <a href="{{ url_for('customer_update', cid=customer[0]) }}" style="color: #f39c12; text-decoration: none; margin-right: 8px;">Sửa</a>
+                    <form method="POST" action="{{ url_for('customer_delete') }}" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa khách hàng {{ customer[0] }}?');">
+                        <input type="hidden" name="cid" value="{{ customer[0] }}">
+                        <input type="hidden" name="redirect_to" value="{{ url_for('customer_display', q=q, page=page) }}">
+                        <button type="submit" style="background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0; font-size: inherit;">Xóa</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="padding: 10px; text-align: center;">Không tìm thấy khách hàng.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+        {% if page > 1 %}
+        <a href="{{ url_for('customer_display', q=q, page=page-1) }}" style="padding: 5px 10px; border: 1px solid #ccc; text-decoration: none; border-radius: 4px; color: #333;">Trước</a>
+        {% endif %}
+
+        <span>Trang {{ page }} / {{ total_pages if total_pages > 0 else 1 }}</span>
+
+        {% if page < total_pages %}
+        <a href="{{ url_for('customer_display', q=q, page=page+1) }}" style="padding: 5px 10px; border: 1px solid #ccc; text-decoration: none; border-radius: 4px; color: #333;">Sau</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

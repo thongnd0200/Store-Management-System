@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Thêm sản phẩm{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Thêm sản phẩm</h1>
+    <div class="id-display">Mã sản phẩm: {{ pid }}</div>
+    <form method="POST">
+        <label>Tên sản phẩm</label>
+        <input type="text" name="pname" required>
+        <div class="form-row">
+            <div>
+                <label>ĐVT chính</label>
+                <input type="text" name="unit1" placeholder="vd: thùng, bao, hộp" required>
+            </div>
+            <div>
+                <label>ĐVT phụ (tùy chọn)</label>
+                <input type="text" name="unit2" id="unit2" placeholder="vd: lon, kg, gói">
+            </div>
+        </div>
+        <div class="form-row">
+            <div id="cf-group" style="display:none;">
+                <label>Hệ số quy đổi</label>
+                <input type="number" name="conversion_factor" id="conversion_factor" step="any" placeholder="1 ĐVT chính = ? ĐVT phụ">
+            </div>
+            <div>
+                <label>Số lượng tồn kho (theo ĐVT chính)</label>
+                <input type="number" name="quantity" step="any" value="0" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div>
+                <label>Đơn giá (theo ĐVT chính)</label>
+                <input type="number" name="price" step="any" required>
+            </div>
+        </div>
+        <button type="submit">Thêm sản phẩm</button>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('unit2').addEventListener('input', function() {
+    document.getElementById('cf-group').style.display = this.value.trim() ? 'block' : 'none';
+});
+</script>
+{% endblock %}

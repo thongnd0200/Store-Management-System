@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}Tạo phiếu nhập{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Tạo phiếu nhập hàng</h1>
+    <div class="id-display">Mã phiếu nhập: {{ purchase_id }}</div>
+    <form method="POST" id="purchase-form">
+        <div style="max-width: 300px; margin-bottom: 15px;">
+            <label>Nhà cung cấp</label>
+            <div style="position: relative;">
+                <input type="text" id="dealer_search" placeholder="Nhập để tìm nhà cung cấp..." autocomplete="off" style="width: 100%;" required>
+                <input type="hidden" name="did" id="did" required>
+                <div id="dealer_suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; max-height: 150px; overflow-y: auto; z-index: 1000; display: none; border-radius: 0 0 4px 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+            </div>
+        </div>
+        <table class="line-items">
+            <thead>
+                <tr><th>Tên sản phẩm</th><th>Đơn vị</th><th>Số lượng</th><th>Đơn giá</th></tr>
+            </thead>
+            <tbody id="items">
+                <tr>
+                    <td style="position: relative;">
+                        <input type="text" class="product_search" placeholder="Nhập để tìm sản phẩm..." autocomplete="off" style="width: 100%; min-width: 200px;" required>
+                        <input type="hidden" name="pid[]" class="pid_input" required>
+                        <div class="product_suggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ccc; max-height: 150px; overflow-y: auto; z-index: 1000; display: none; border-radius: 0 0 4px 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></div>
+                    </td>
+                    <td>
+                        <select name="unit[]" class="unit_select" style="min-width: 80px;" required>
+                            <option value="">--</option>
+                        </select>
+                    </td>
+                    <td><input type="number" name="qty[]" step="any" required style="width: 80px;"></td>
+                    <td><input type="number" name="price[]" step="any" class="price_input" required style="width: 110px;"></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="btn-group">
+            <button type="button" onclick="addRow()">Thêm dòng</button>
+            <button type="button" class="secondary" onclick="removeRow()">Xóa dòng</button>
+            <button type="submit">Gửi</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const dealerSearch = document.getElementById('dealer_search');
+const dealerSuggestionsBox = document.getElementById('dealer_suggestions');
+const didInput = document.getElementById('did');
+let dealerTimeout = null;
+
+dealerSearch.addEventListener('input', function() {
+    clearTimeout(dealerTimeout);
+    const q = this.value;
+    didInput.value = '';
+    if (q.length < 1) { dealerSuggestionsBox.style.display = 'none'; return; }
+    dealerTimeout = setTimeout(() => {
+        fetch('/api/dealers?q=' + encodeURIComponent(q))
+            .then(res => res.json())
+            .then(data => {
+                dealerSuggestionsBox.innerHTML = '';
+                if (data.length > 0) {
+                    data.forEach(d => {
+                        const div = document.createElement('div');
+                        div.style.padding = '8px 10px';
+                        div.style.cursor = 'pointer';
+                        div.style.borderBottom = '1px solid #eee';
+                        div.textContent = d.dname;
+                        div.onclick = function() {
+                            dealerSearch.value = d.dname;
+                            didInput.value = d.did;
+                            dealerSuggestionsBox.style.display = 'none';
+                        };
+                        div.onmouseover = function() { this.style.backgroundColor = '#f0f0f0'; };
+                        div.onmouseout = function() { this.style.backgroundColor = 'transparent'; };
+                        dealerSuggestionsBox.appendChild(div);
+                    });
+                    dealerSuggestionsBox.style.display = 'block';
+                } else {
+                    const div = document.createElement('div');
+                    div.style.padding = '8px 10px';
+                    div.style.color = '#777';
+                    div.textContent = 'Không tìm thấy nhà cung cấp';
+                    dealerSuggestionsBox.appendChild(div);
+                    dealerSuggestionsBox.style.display = 'block';
+                }
+            });
+    }, 300);
+});
+
+// Close suggestion dropdowns on outside click
+document.addEventListener('click', function(e) {
+    if (e.target !== dealerSearch && e.target !== dealerSuggestionsBox) {
+        dealerSuggestionsBox.style.display = 'none';
+    }
+    if (!e.target.classList.contains('product_search') && !e.target.classList.contains('product_suggestions')) {
+        document.querySelectorAll('.product_suggestions').forEach(box => box.style.display = 'none');
+    }
+});
+
+// Product autocomplete
+let productTimeout = null;
+document.getElementById('items').addEventListener('input', function(e) {
+    if (e.target.classList.contains('product_search')) {
+        clearTimeout(productTimeout);
+        const searchInput = e.target;
+        const q = searchInput.value;
+        const row = searchInput.closest('tr');
+        const pidInput = row.querySelector('.pid_input');
+        const sugBox = row.querySelector('.product_suggestions');
+        const unitSelect = row.querySelector('.unit_select');
+        const priceInput = row.querySelector('.price_input');
+
+        pidInput.value = '';
+        unitSelect.innerHTML = '<option value="">--</option>';
+        priceInput.value = '';
+
+        if (q.length < 1) { sugBox.style.display = 'none'; return; }
+
+        productTimeout = setTimeout(() => {
+            fetch('/api/products?q=' + encodeURIComponent(q))
+                .then(res => res.json())
+                .then(data => {
+                    sugBox.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(prod => {
+                            const div = document.createElement('div');
+                            div.style.padding = '8px 10px';
+                            div.style.cursor = 'pointer';
+                            div.style.borderBottom = '1px solid #eee';
+                            let label = prod.pname + ' (' + prod.unit1;
+                            if (prod.unit2) label += '/' + prod.unit2;
+                            label += ', Giá: ' + prod.price.toLocaleString() + ', Tồn: ' + prod.quantity + ' ' + prod.unit1 + ')';
+                            div.textContent = label;
+                            div.onclick = function() {
+                                searchInput.value = prod.pname;
+                                pidInput.value = prod.pid;
+                                row.dataset.unit1 = prod.unit1;
+                                row.dataset.unit2 = prod.unit2 || '';
+                                row.dataset.cf = prod.conversion_factor || '';
+                                row.dataset.price = prod.price;
+                                unitSelect.innerHTML = '';
+                                const opt1 = document.createElement('option');
+                                opt1.value = prod.unit1;
+                                opt1.textContent = prod.unit1;
+                                unitSelect.appendChild(opt1);
+                                if (prod.unit2) {
+                                    const opt2 = document.createElement('option');
+                                    opt2.value = prod.unit2;
+                                    opt2.textContent = prod.unit2;
+                                    unitSelect.appendChild(opt2);
+                                }
+                                priceInput.value = prod.price;
+                                sugBox.style.display = 'none';
+                            };
+                            div.onmouseover = function() { this.style.backgroundColor = '#f0f0f0'; };
+                            div.onmouseout = function() { this.style.backgroundColor = 'transparent'; };
+                            sugBox.appendChild(div);
+                        });
+                        sugBox.style.display = 'block';
+                    } else {
+                        const div = document.createElement('div');
+                        div.style.padding = '8px 10px';
+                        div.style.color = '#777';
+                        div.textContent = 'Không tìm thấy sản phẩm';
+                        sugBox.appendChild(div);
+                        sugBox.style.display = 'block';
+                    }
+                });
+        }, 300);
+    }
+});
+
+// When unit changes, update default price
+document.getElementById('items').addEventListener('change', function(e) {
+    if (e.target.classList.contains('unit_select')) {
+        const row = e.target.closest('tr');
+        const priceInput = row.querySelector('.price_input');
+        const basePrice = parseFloat(row.dataset.price) || 0;
+        const cf = parseFloat(row.dataset.cf) || 0;
+        const unit1 = row.dataset.unit1;
+
+        if (e.target.value === unit1 || !cf) {
+            priceInput.value = Math.round(basePrice);
+        } else {
+            priceInput.value = Math.round(basePrice / cf);
+        }
+    }
+});
+
+// Form validation
+document.getElementById('purchase-form').addEventListener('submit', function(e) {
+    if (!didInput.value) {
+        e.preventDefault();
+        alert('Vui lòng chọn nhà cung cấp từ danh sách gợi ý.');
+        return;
+    }
+    let valid = true;
+    document.querySelectorAll('.pid_input').forEach(input => {
+        if (!input.value) valid = false;
+    });
+    if (!valid) {
+        e.preventDefault();
+        alert('Vui lòng chọn sản phẩm từ danh sách gợi ý.');
+    }
+});
+
+function addRow() {
+    const tbody = document.getElementById('items');
+    const row = tbody.rows[0].cloneNode(true);
+    row.querySelectorAll('input').forEach(i => { i.value = ''; });
+    row.querySelector('.unit_select').innerHTML = '<option value="">--</option>';
+    row.querySelector('.product_suggestions').style.display = 'none';
+    row.dataset.unit1 = '';
+    row.dataset.unit2 = '';
+    row.dataset.cf = '';
+    row.dataset.price = '';
+    tbody.appendChild(row);
+}
+function removeRow() {
+    const tbody = document.getElementById('items');
+    if (tbody.rows.length > 1) tbody.deleteRow(-1);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Phiếu xuất hàng{% endblock %}
+{% block content %}
+<div class="card">
+    {% if invoice_id %}
+        <div class="no-print" style="margin-bottom: 20px;">
+            <a href="{{ url_for('invoice_display') }}" style="display: inline-block; margin-right: 10px; text-decoration: none; color: #333; border: 1px solid #ccc; padding: 8px 14px; border-radius: 4px; font-size: 14px; line-height: 1.2;">&larr; Quay lại danh sách</a>
+            <button onclick="window.print()" style="padding: 8px 14px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; line-height: 1.2;">In hóa đơn</button>
+        </div>
+
+        {% if invoice %}
+        <div style="margin-bottom: 10px;">
+            <p style="margin: 0; font-weight: bold; font-size: 16px;">NPP THANH PHƯƠNG DUNG</p>
+            <p style="margin: 2px 0;"><strong>ĐT:</strong> 0905.622.411 - 0905.088.745 </p>
+            <p style="margin: 2px 0;"><strong>Địa chỉ:</strong> 232 Dương Loan - Hòa Xuân - Đà Nẵng </p>
+        </div>
+        <h1 style="text-align: center; margin-top: 0;">HÓA ĐƠN BÁN HÀNG</h1>
+        <div class="invoice-info" style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 200px;">
+                <p><strong>Khách hàng:</strong> {{ cname }}</p>
+                <p><strong>Mã KH:</strong> {{ invoice[1] }}</p>
+                <p><strong>Địa chỉ:</strong> {{ caddress }}</p>
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+                <p><strong>Mã HĐ:</strong> {{ invoice[0] }}</p>
+                <p><strong>Ngày:</strong> {{ invoice[3] }}</p>
+                <p><strong>Nhân viên bán hàng:</strong> {{ sname }}</p>
+            </div>
+        </div>
+        {% if items %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid #ccc;">
+                    <th style="padding: 10px;">STT</th>
+                    <th style="padding: 10px;">Tên sản phẩm</th>
+                    <th style="padding: 10px;">Đơn vị</th>
+                    <th style="padding: 10px;">Số lượng</th>
+                    <th style="padding: 10px;">Đơn giá</th>
+                    <th style="padding: 10px;">Chiết khấu</th>
+                    <th style="padding: 10px;">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;">{{ loop.index }}</td>
+                    <td style="padding: 10px;">{{ item[1] }}</td>
+                    <td style="padding: 10px;">{{ item[2] }}</td>
+                    <td style="padding: 10px;">{{ item[3] }}</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(item[4]) }}</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(item[5]) if item[5] else '' }}</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(item[3] * item[4] - (item[5] or 0)) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr style="border-top: 2px solid #333;">
+                    <td colspan="6" style="padding: 10px; text-align: right;">Tạm tính:</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(subtotal) }}</td>
+                </tr>
+                {% if order_discount > 0 %}
+                <tr>
+                    <td colspan="6" style="padding: 10px; text-align: right;">Chiết khấu:</td>
+                    <td style="padding: 10px;">-{{ '{:,.0f}'.format(order_discount) }}</td>
+                </tr>
+                {% endif %}
+                <tr style="font-weight: bold;">
+                    <td colspan="6" style="padding: 10px; text-align: right;">Tổng cộng:</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(items_total) }}</td>
+                </tr>
+            </tfoot>
+        </table>
+        {% else %}
+        <p>Không có chi tiết cho hóa đơn này.</p>
+        {% endif %}
+        {% endif %}
+
+    {% else %}
+        <h1>Hóa đơn</h1>
+        <form method="GET" action="{{ url_for('invoice_display') }}" style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+            <input type="text" name="q" value="{{ q }}" placeholder="Tìm theo mã hóa đơn hoặc mã KH..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 200px;">
+            <input type="text" name="customer_name" value="{{ customer_name }}" placeholder="Tên khách hàng..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px;">
+            <input type="text" name="salesperson_name" value="{{ salesperson_name }}" placeholder="Tên nhân viên..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; min-width: 150px;">
+            <input type="date" name="start_date" value="{{ start_date }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" title="Từ ngày">
+            <input type="date" name="end_date" value="{{ end_date }}" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" title="Đến ngày">
+            <button type="submit" style="padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Tìm kiếm</button>
+        </form>
+
+        <table style="width: 100%; border-collapse: collapse;" id="invoice-table">
+            <thead>
+                <tr style="text-align: left; border-bottom: 1px solid #ccc;">
+                    <th style="padding: 10px; width: 30px;"><input type="checkbox" id="select-all"></th>
+                    <th style="padding: 10px;">STT</th>
+                    <th style="padding: 10px;">Mã HĐ</th>
+                    <th style="padding: 10px;">Mã KH</th>
+                    <th style="padding: 10px;">Tên khách hàng</th>
+                    <th style="padding: 10px;">Nhân viên</th>
+                    <th style="padding: 10px;">Ngày</th>
+                    <th style="padding: 10px;">Tổng tiền</th>
+                    <th style="padding: 10px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inv in invoices %}
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 10px;"><input type="checkbox" class="inv-check" value="{{ inv[0] }}"></td>
+                    <td style="padding: 10px;">{{ (page - 1) * 10 + loop.index }}</td>
+                    <td style="padding: 10px;">{{ inv[0] }}</td>
+                    <td style="padding: 10px;">{{ inv[1] }}</td>
+                    <td style="padding: 10px;">{{ inv[2] }}</td>
+                    <td style="padding: 10px;">{{ inv[3] or '' }}</td>
+                    <td style="padding: 10px;">{{ inv[4] }}</td>
+                    <td style="padding: 10px;">{{ '{:,.0f}'.format(inv[5]) if inv[5] else 0 }}</td>
+                    <td style="padding: 10px; white-space: nowrap;">
+                        <a href="{{ url_for('invoice_display', invoice_id=inv[0]) }}" style="color: #007bff; text-decoration: none; margin-right: 8px;">Xem</a>
+                        <a href="{{ url_for('invoice_update', invoice_id=inv[0]) }}" style="color: #f39c12; text-decoration: none; margin-right: 8px;">Sửa</a>
+                        <form method="POST" action="{{ url_for('invoice_delete') }}" style="display: inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa hóa đơn {{ inv[0] }}?');">
+                            <input type="hidden" name="invoice_id" value="{{ inv[0] }}">
+                            <input type="hidden" name="redirect_to" value="{{ url_for('invoice_display', q=q, customer_name=customer_name, salesperson_name=salesperson_name, start_date=start_date, end_date=end_date, page=page) }}">
+                            <button type="submit" style="background: none; border: none; color: #e74c3c; cursor: pointer; padding: 0; font-size: inherit; text-decoration: none;">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9" style="padding: 10px; text-align: center;">Không tìm thấy hóa đơn.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if invoices %}
+        <form method="POST" action="{{ url_for('invoice_summary') }}" id="summary-form" style="margin-top: 12px;">
+            <button type="submit" style="padding: 8px 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Tổng hợp đơn hàng</button>
+        </form>
+        {% endif %}
+
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+            {% if page > 1 %}
+            <a href="{{ url_for('invoice_display', q=q, customer_name=customer_name, salesperson_name=salesperson_name, start_date=start_date, end_date=end_date, page=page-1) }}" style="padding: 5px 10px; border: 1px solid #ccc; text-decoration: none; border-radius: 4px; color: #333;">Trước</a>
+            {% endif %}
+
+            <span>Trang {{ page }} / {{ total_pages if total_pages > 0 else 1 }}</span>
+
+            {% if page < total_pages %}
+            <a href="{{ url_for('invoice_display', q=q, customer_name=customer_name, salesperson_name=salesperson_name, start_date=start_date, end_date=end_date, page=page+1) }}" style="padding: 5px 10px; border: 1px solid #ccc; text-decoration: none; border-radius: 4px; color: #333;">Sau</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+var selectAll = document.getElementById('select-all');
+if (selectAll) {
+    selectAll.addEventListener('change', function() {
+        document.querySelectorAll('.inv-check').forEach(cb => cb.checked = this.checked);
+    });
+}
+var summaryForm = document.getElementById('summary-form');
+if (summaryForm) {
+    summaryForm.addEventListener('submit', function(e) {
+        var checked = document.querySelectorAll('.inv-check:checked');
+        if (checked.length === 0) {
+            e.preventDefault();
+            alert('Vui lòng chọn ít nhất một hóa đơn.');
+            return;
+        }
+        // Add hidden inputs for selected invoice IDs
+        this.querySelectorAll('input[name="invoice_ids"]').forEach(el => el.remove());
+        checked.forEach(cb => {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'invoice_ids';
+            input.value = cb.value;
+            summaryForm.appendChild(input);
+        });
+    });
+}
+</script>
+{% endblock %}

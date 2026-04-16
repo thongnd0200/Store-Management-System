@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Xóa hóa đơn{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Xóa hóa đơn</h1>
+    <form method="POST" class="inline-form">
+        <div class="field">
+            <label>Mã hóa đơn</label>
+            <input type="text" name="invoice_id" required>
+        </div>
+        <button type="submit" class="danger">Xóa</button>
+    </form>
+</div>
+{% endblock %}

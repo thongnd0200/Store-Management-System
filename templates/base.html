@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hệ Thống Quản Lý Cửa Hàng{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}" class="brand">Quản Lý Cửa Hàng</a>
+        <a href="{{ url_for('product_list') }}">Sản phẩm</a>
+        <a href="{{ url_for('product_stock') }}">Kho hàng</a>
+        <a href="{{ url_for('invoice_add') }}">Hóa đơn mới</a>
+        <a href="{{ url_for('purchase_add') }}">Nhập hàng mới</a>
+    </nav>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
