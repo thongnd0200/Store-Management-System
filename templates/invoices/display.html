@@ -9,10 +9,13 @@
         </div>
 
         {% if invoice %}
-        <div style="margin-bottom: 10px;">
-            <p style="margin: 0; font-weight: bold; font-size: 16px;">NPP THANH PHƯƠNG DUNG</p>
-            <p style="margin: 2px 0;"><strong>ĐT:</strong> 0905.622.411 - 0905.088.745 </p>
-            <p style="margin: 2px 0;"><strong>Địa chỉ:</strong> 232 Dương Loan - Hòa Xuân - Đà Nẵng </p>
+        <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p style="margin: 0; font-weight: bold; font-size: 16px;">NPP THANH PHƯƠNG DUNG</p>
+                <p style="margin: 2px 0;"><strong>ĐT:</strong> 0905.622.411 - 0905.088.745 </p>
+                <p style="margin: 2px 0;"><strong>Địa chỉ:</strong> 232 Dương Loan - Hòa Xuân - Đà Nẵng </p>
+            </div>
+            <img src="{{ url_for('static', filename='92d9337b-5335-4a1a-98ff-03f5e00e5fe2.jpg') }}" alt="QR Payment" style="width: 80px; height: 80px;">
         </div>
         <h1 style="text-align: center; margin-top: 0;">HÓA ĐƠN BÁN HÀNG</h1>
         <div class="invoice-info" style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; gap: 20px; flex-wrap: wrap;">
