@@ -699,11 +699,12 @@ def invoice_display():
             cur.execute(f"SELECT Product.PID, PName, InvoiceDetails.SelectedUnit, InvoiceDetails.Quantity, InvoiceDetails.Price, InvoiceDetails.Discount FROM InvoiceDetails, Product WHERE InvoiceDetails.InvoiceID='{invoice_id}' AND InvoiceDetails.PID = Product.PID")
             items = cur.fetchall()
             subtotal = sum(float(item[3]) * float(item[4]) - float(item[5] or 0) for item in items)
+            total_qty = sum(float(item[3]) for item in items)
             order_discount = float(invoice[5] or 0)  # amount
             items_total = subtotal - order_discount
         cur.close()
         db.close()
-        return render_template('invoices/display.html', invoice_id=invoice_id, invoice=invoice, cname=cname, caddress=caddress, sname=sname, items=items, subtotal=subtotal if invoice else 0, order_discount=order_discount if invoice else 0, items_total=items_total)
+        return render_template('invoices/display.html', invoice_id=invoice_id, invoice=invoice, cname=cname, caddress=caddress, sname=sname, items=items, subtotal=subtotal if invoice else 0, total_qty=total_qty if invoice else 0, order_discount=order_discount if invoice else 0, items_total=items_total)
 
     q = request.args.get('q', '')
     customer_name = request.args.get('customer_name', '')
@@ -711,7 +712,7 @@ def invoice_display():
     start_date = request.args.get('start_date', '')
     end_date = request.args.get('end_date', '')
     page = request.args.get('page', 1, type=int)
-    per_page = 10
+    per_page = 50
     offset = (page - 1) * per_page
 
     db = get_db()
