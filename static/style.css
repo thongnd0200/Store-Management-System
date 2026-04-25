@@ -146,7 +146,7 @@ tr:hover { background: #eef; }
         size: A5 portrait;
         margin: 8mm;
     }
-    nav, .no-print {
+    nav, .no-print, .flash {
         display: none !important;
     }
     .print-only {
@@ -154,7 +154,11 @@ tr:hover { background: #eef; }
     }
     body {
         background: #fff;
-        font-size: 11px;
+        color: #000;
+        font-size: 12px;
+        line-height: 1.25;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
     .container {
         max-width: 100%;
@@ -171,10 +175,24 @@ tr:hover { background: #eef; }
         margin-bottom: 6px;
     }
     table {
-        font-size: 9px;
+        font-size: 12px;
+        color: #000;
+        font-weight: 500;
+        border: 1px solid #000;
     }
     table th, table td {
-        padding: 2px 4px;
+        padding: 2px 5px !important;
+        line-height: 1.2;
+        border: 1px solid #000;
+    }
+    table th {
+        font-weight: 700;
+        background: #fff !important;
+        color: #000 !important;
+        border-bottom: 1px solid #000;
+    }
+    table tr:nth-child(even) {
+        background: #fff !important;
     }
     tfoot {
         break-inside: avoid;
@@ -185,9 +203,15 @@ tr:hover { background: #eef; }
         page-break-inside: avoid;
     }
     .invoice-info {
-        font-size: 10px;
-        padding: 8px !important;
-        margin-bottom: 10px !important;
+        font-size: 12px;
+        color: #000;
+        padding: 6px 8px !important;
+        margin-bottom: 8px !important;
+        gap: 12px !important;
+        font-weight: 500;
+    }
+    .invoice-info strong {
+        font-weight: 700;
     }
     p {
         margin: 1px 0;
