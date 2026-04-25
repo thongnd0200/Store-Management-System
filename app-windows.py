@@ -665,11 +665,12 @@ def invoice_confirm():
     items = cur.fetchall()
     # items: (PID, PName, Unit, Qty, Price, DiscountAmt)
     subtotal = sum(float(item[3]) * float(item[4]) - float(item[5] or 0) for item in items)
+    total_qty = sum(float(item[3]) for item in items)
     order_discount = float(invoice[5] or 0)  # Invoices.Discount column (amount)
     items_total = subtotal - order_discount
     cur.close()
     db.close()
-    return render_template('invoices/confirm.html', invoice_id=invoice_id, invoice=invoice, cname=cname, caddress=caddress, sname=sname, items=items, subtotal=subtotal, order_discount=order_discount, items_total=items_total)
+    return render_template('invoices/confirm.html', invoice_id=invoice_id, invoice=invoice, cname=cname, caddress=caddress, sname=sname, items=items, subtotal=subtotal, total_qty=total_qty, order_discount=order_discount, items_total=items_total)
 
 
 @app.route('/invoices/display')

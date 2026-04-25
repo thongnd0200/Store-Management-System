@@ -20,7 +20,6 @@
     <table style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr style="text-align: left; border-bottom: 2px solid #333;">
-                <th style="padding: 10px;">Mã SP</th>
                 <th style="padding: 10px;">Tên sản phẩm</th>
                 <th style="padding: 10px; text-align: right;">SL (ĐVT chính)</th>
                 <th style="padding: 10px; text-align: right;">SL (ĐVT phụ)</th>
@@ -30,7 +29,6 @@
         <tbody>
         {% for pid, p in product_list %}
             <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 10px;">{{ pid }}</td>
                 <td style="padding: 10px;">{{ p.pname }}</td>
                 <td style="padding: 10px; text-align: right;">
                     {% if p.qty_unit1 > 0 %}{{ '{:,.2f}'.format(p.qty_unit1) }} {{ p.unit1 }}{% else %}-{% endif %}
@@ -44,7 +42,7 @@
         </tbody>
         <tfoot>
             <tr style="border-top: 2px solid #333; font-weight: bold;">
-                <td colspan="2" style="padding: 10px; text-align: right;">Tổng cộng:</td>
+                <td style="padding: 10px; text-align: right;">Tổng cộng:</td>
                 <td style="padding: 10px; text-align: right;">{{ '{:,.2f}'.format(total_unit1) }}</td>
                 <td style="padding: 10px; text-align: right;">{{ '{:,.2f}'.format(total_unit2) }}</td>
                 <td style="padding: 10px; text-align: right;">{{ '{:,.0f}'.format(grand_total) }}</td>
